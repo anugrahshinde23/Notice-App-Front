@@ -6,7 +6,9 @@ import 'package:frontend/Screens/register_screen.dart';
 import 'package:frontend/Services/api_services.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String? collegeId;
+  final String? classId;
+  const LoginScreen({super.key,  this.collegeId, this.classId});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -27,10 +29,19 @@ class _LoginScreenState extends State<LoginScreen> {
       print(role);
       if (role == 'teacher') {
         print("successfully login as teacher");
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => TeacherMainScreen()));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TeacherMainScreen()),
+        );
       } else if (role == 'student') {
         print("successfully login as student");
-         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => StudentHomeScreenTopbar(studentName : nameController.text)));
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+               StudentHomeScreenTopbar(studentName: nameController.text, collegeId: data['user']['college_id'].toString(), classId: data['user']['class_id'].toString()),
+          ),
+        );
       }
     } else {
       print("login failed ${data['message']} ");
@@ -57,7 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 SizedBox(height: 100),
-
 
                 Container(
                   height: 50,
@@ -108,9 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   style: ButtonStyle(
                     minimumSize: WidgetStatePropertyAll(Size(320, 50)),
-                    backgroundColor: WidgetStatePropertyAll(
-                      Color(0XFF2B2B2B),
-                    ),
+                    backgroundColor: WidgetStatePropertyAll(Color(0XFF2B2B2B)),
                   ),
                   child: Text(
                     "Sign in",
@@ -132,14 +140,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                      MaterialPageRoute(builder: (context) => RegisterScreen(collegeId: widget.collegeId.toString(), classId: widget.classId.toString())),
                     );
                   },
                   style: ButtonStyle(
                     minimumSize: WidgetStatePropertyAll(Size(320, 50)),
-                    backgroundColor: WidgetStatePropertyAll(
-                      Color(0XFF2B2B2B),
-                    ),
+                    backgroundColor: WidgetStatePropertyAll(Color(0XFF2B2B2B)),
                   ),
                   child: Text(
                     "Sign up",

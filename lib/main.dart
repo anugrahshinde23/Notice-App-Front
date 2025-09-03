@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/login_screen.dart';
-import 'package:frontend/Screens/register_screen.dart';
+import 'package:frontend/Screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,11 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData.light(),
-     initialRoute: '/login',
-     routes: {
-      '/login' : (context) => LoginScreen(),
-      '/register' : (context) => RegisterScreen(),
-     },
+     home: SplashScreen(),
     );
   }
 }

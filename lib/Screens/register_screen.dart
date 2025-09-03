@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/Screens/choose_faculty_screen.dart';
 import 'package:frontend/Screens/login_screen.dart';
-import 'package:frontend/Services/api_services.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+  final String collegeId;
+  final String classId;
+  const RegisterScreen({super.key, required this.collegeId, required this.classId});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -14,22 +16,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final nameController = TextEditingController();
   final passwordContoller = TextEditingController();
 
-  void registerUser() async {
-    final data = await ApiServices.register(
-      nameController.text,
-      value,
-      passwordContoller.text,
-    );
+  // void registerUser() async {
+  //   final data = await ApiServices.register(
+  //     nameController.text,
+  //     value,
+  //     passwordContoller.text,
+  //   );
 
-    if (data.containsKey('user')) {
-      print("registered successfully ${data['user']}");
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
-    } else {
-      print("failed to register ${data['message']}");
-    }
+  //   if (data.containsKey('user')) {
+  //     print("registered successfully ${data['user']}");
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => ChooseFacultyScreen(name: nameController.text, role: value, password: passwordContoller.text)),
+  //     );
+  //   } else {
+  //     print("failed to register ${data['message']}");
+  //   }
+  // }
+
+  void gotoChooseFaculty() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (contex) => ChooseFacultyScreen(
+          name: nameController.text,
+          role: value,
+          password: passwordContoller.text,
+        ),
+      ),
+    );
   }
 
   @override
@@ -52,14 +67,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 SizedBox(height: 100),
-            
-               
-               
-            
+
                 Container(
                   height: 50,
                   width: 320,
-            
+
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: Color(0XFFD4D4D4),
@@ -75,13 +87,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 20),
-            
+
                 Container(
                   height: 50,
                   width: 320,
-            
+
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: Color(0XFFD4D4D4),
@@ -97,7 +109,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 20),
                 Container(
                   height: 50,
@@ -119,7 +131,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           value = newValue!;
                         });
                       },
-            
+
                       items: [
                         DropdownMenuItem(
                           value: 'student',
@@ -136,13 +148,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(height: 50),
                 ElevatedButton(
                   onPressed: () {
-                    registerUser();
+                    gotoChooseFaculty();
                   },
                   style: ButtonStyle(
                     minimumSize: WidgetStatePropertyAll(Size(320, 50)),
-                    backgroundColor: WidgetStatePropertyAll(
-                      Color(0XFF2B2B2B),
-                    ),
+                    backgroundColor: WidgetStatePropertyAll(Color(0XFF2B2B2B)),
                   ),
                   child: Text(
                     "Register",
@@ -153,7 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
-            
+
                 SizedBox(height: 20),
                 Text(
                   "Already have an account?",
@@ -164,14 +174,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      MaterialPageRoute(builder: (context) => LoginScreen(collegeId: widget.collegeId.isNotEmpty ? widget.collegeId : null, classId: widget.classId.isNotEmpty ? widget.classId : null)),
                     );
                   },
                   style: ButtonStyle(
                     minimumSize: WidgetStatePropertyAll(Size(320, 50)),
-                    backgroundColor: WidgetStatePropertyAll(
-                      Color(0XFF2B2B2B),
-                    ),
+                    backgroundColor: WidgetStatePropertyAll(Color(0XFF2B2B2B)),
                   ),
                   child: Text(
                     "Sign in",
