@@ -8,7 +8,7 @@ import 'package:frontend/Services/api_services.dart';
 class LoginScreen extends StatefulWidget {
   final String? collegeId;
   final String? classId;
-  const LoginScreen({super.key,  this.collegeId, this.classId});
+  const LoginScreen({super.key, this.collegeId, this.classId});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -31,15 +31,27 @@ class _LoginScreenState extends State<LoginScreen> {
         print("successfully login as teacher");
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => TeacherMainScreen()),
+          MaterialPageRoute(
+            builder: (context) => TeacherMainScreen(
+              collegeId: data['user']['college_id'].toString(),
+              classId: data['user']['class_id'].toString(),
+              teacherId: data['user']['id'],
+              teacherName: data['user']['name'],
+            ),
+          ),
         );
       } else if (role == 'student') {
-        print("successfully login as student");
+       
+       
+              print("successfully login as student");
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-               StudentHomeScreenTopbar(studentName: nameController.text, collegeId: data['user']['college_id'].toString(), classId: data['user']['class_id'].toString()),
+            builder: (context) => StudentHomeScreenTopbar(
+              studentName: nameController.text,
+              collegeId: data['user']['college_id'].toString(),
+              classId: data['user']['class_id'].toString(),
+            ),
           ),
         );
       }
@@ -140,7 +152,12 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen(collegeId: widget.collegeId.toString(), classId: widget.classId.toString())),
+                      MaterialPageRoute(
+                        builder: (context) => RegisterScreen(
+                          collegeId: widget.collegeId.toString(),
+                          classId: widget.classId.toString(),
+                        ),
+                      ),
                     );
                   },
                   style: ButtonStyle(

@@ -2,11 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:frontend/Screens/student_home_screen.dart';
 import 'package:frontend/Screens/updates_screen.dart';
 
+
 class StudentHomeScreenTopbar extends StatefulWidget {
   final String studentName;
   final String collegeId;
   final String classId;
-  const StudentHomeScreenTopbar({super.key, required this.studentName, required this.collegeId, required this.classId});
+
+  const StudentHomeScreenTopbar({
+    super.key,
+    required this.studentName,
+    required this.collegeId,
+    required this.classId,
+
+  });
 
   @override
   State<StudentHomeScreenTopbar> createState() =>
@@ -14,6 +22,9 @@ class StudentHomeScreenTopbar extends StatefulWidget {
 }
 
 class _StudentHomeScreenTopbarState extends State<StudentHomeScreenTopbar> {
+ 
+
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -42,7 +53,15 @@ class _StudentHomeScreenTopbarState extends State<StudentHomeScreenTopbar> {
             ],
           ),
         ),
-        body: TabBarView(children: [StudentHomeScreen(collegeId: widget.collegeId , classId: widget.classId ), UpdatesScreen()]),
+        body: TabBarView(
+          children: [
+            StudentHomeScreen(
+              collegeId: widget.collegeId,
+              classId: widget.classId,
+            ),
+            UpdatesScreen(),
+          ],
+        ),
       ),
     );
   }

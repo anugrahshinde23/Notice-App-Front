@@ -3,7 +3,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class NoticeScreen extends StatefulWidget {
-  const NoticeScreen({super.key});
+  final String collegeId;
+  final String classId;
+  const NoticeScreen({super.key, required this.collegeId, required this.classId});
 
   @override
   State<NoticeScreen> createState() => _NoticeScreenState();
@@ -16,13 +18,17 @@ class _NoticeScreenState extends State<NoticeScreen> {
   @override
   void initState() {
     super.initState();
+    // print(widget.classId);
+    // print(widget.collegeId);
     fetchNotices();
   }
 
   Future<void> fetchNotices() async {
     try {
       final response = await http.get(
-        Uri.parse("http://192.168.179.124:1000/notice/get"),
+        Uri.parse(
+          "http://10.46.74.71:1000/notice/get/${widget.collegeId}/${widget.classId}",
+        ),
       );
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -46,89 +52,91 @@ class _NoticeScreenState extends State<NoticeScreen> {
     return Scaffold(
       backgroundColor: Color(0XFFFFFFFF),
       appBar: AppBar(
-        title: const Text("All Notices",style: TextStyle(color: Color(0XFFFFFFFF)),),
+        title: const Text(
+          "All Notices",
+          style: TextStyle(color: Color(0XFFFFFFFF)),
+        ),
         backgroundColor: Color(0XFF2B2B2B),
         centerTitle: true,
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : notices.isEmpty
-              ? const Center(child: Text("No notices available"))
-              : ListView.builder(
-                  itemCount: notices.length,
-                  itemBuilder: (context, index) {
-                    final notice = notices[index];
-                    String? filePath = notice["file_path"];
+          ? const Center(child: Text("No notices available"))
+          : ListView.builder(
+              itemCount: notices.length,
+              itemBuilder: (context, index) {
+                final notice = notices[index];
+                String? filePath = notice["file_path"];
 
-                    // 🔥 Normalize file path
-                    if (filePath != null && filePath.isNotEmpty) {
-                      filePath = filePath.replaceAll("\\", "/"); // windows fix
-                      if (filePath.contains("/")) {
-                        // sirf filename lo
-                        filePath = filePath.split("/").last;
-                      }
-                    }
+                // 🔥 Normalize file path
+                if (filePath != null && filePath.isNotEmpty) {
+                  filePath = filePath.replaceAll("\\", "/"); // windows fix
+                  if (filePath.contains("/")) {
+                    // sirf filename lo
+                    filePath = filePath.split("/").last;
+                  }
+                }
 
-                    final imageUrl = (filePath != null && filePath.isNotEmpty)
-                        ? "http://192.168.179.124:1000/uploads/$filePath"
-                        : null;
+                final imageUrl = (filePath != null && filePath.isNotEmpty)
+                    ? "http://10.46.74.71:1000/uploads/$filePath"
+                    : null;
 
-                    return Card(
-                      color: Color(0XFFD4D4D4),
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 20,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              notice["title"] ?? "No Title",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(notice["content"] ?? "No Content"),
-                            const SizedBox(height: 10),
-
-                            // 👇 image preview
-                            if (imageUrl != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                              
-                                child: Image.network(
-                                  imageUrl,
-                                  height: 200,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                          const Text("Image not available"),
-                                ),
-                              ),
-
-                            const SizedBox(height: 10),
-                            Text(
-                              "Date: ${notice["created_at"]}",
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0XFFB3B3B3),
-                              ),
-                            ),
-                          ],
+                return Card(
+                  color: Color(0XFFD4D4D4),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 20,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          notice["title"] ?? "No Title",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                ),
+                        const SizedBox(height: 6),
+                        Text(notice["content"] ?? "No Content"),
+                        const SizedBox(height: 10),
+
+                        // 👇 image preview
+                        if (imageUrl != null)
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+
+                            child: Image.network(
+                              imageUrl,
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Text("Image not available"),
+                            ),
+                          ),
+
+                        const SizedBox(height: 10),
+                        Text(
+                          "Date: ${notice["created_at"]}",
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0XFFB3B3B3),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

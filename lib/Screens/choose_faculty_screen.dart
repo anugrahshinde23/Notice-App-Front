@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ChooseFacultyScreen extends StatefulWidget {
+  
   final String name;
   final String role;
   final String password;
@@ -33,7 +34,7 @@ class _ChooseFacultyScreenState extends State<ChooseFacultyScreen> {
 
   Future<void> fetchColleges() async {
     final response = await http.get(
-      Uri.parse("http://192.168.179.124:1000/info/colleges"),
+      Uri.parse("http://10.46.74.71:1000/info/colleges"),
     );
     print(response);
     if (response.statusCode == 200) {
@@ -47,7 +48,7 @@ class _ChooseFacultyScreenState extends State<ChooseFacultyScreen> {
 
   Future<void> fetchClasses(String collegeId) async {
     final response = await http.get(
-      Uri.parse("http://192.168.179.124:1000/info/classes/$collegeId"),
+      Uri.parse("http://10.46.74.71:1000/info/classes/$collegeId"),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -60,14 +61,14 @@ class _ChooseFacultyScreenState extends State<ChooseFacultyScreen> {
 
   Future<void> completeRegistration() async {
     final response = await http.post(
-      Uri.parse('http://192.168.179.124:1000/api/register'),
+      Uri.parse('http://10.46.74.71:1000/api/register'),
       headers: {"Content-Type": "application/json"},
       body: json.encode({
         "name": widget.name,
         "password": widget.password,
         "role": widget.role,
         "college_id": selectedCollege,
-        "class_id": selectedClass,
+        "class_id": selectedClass == "all" ? null : selectedClass,
       }),
     );
 
@@ -77,7 +78,12 @@ class _ChooseFacultyScreenState extends State<ChooseFacultyScreen> {
       ).showSnackBar(SnackBar(content: Text("Registration successful")));
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginScreen(collegeId: selectedCollege.toString(), classId: selectedClass.toString())),
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(
+            collegeId: selectedCollege.toString(),
+            classId: selectedClass.toString(),
+          ),
+        ),
       );
     } else {
       ScaffoldMessenger.of(
@@ -116,14 +122,18 @@ class _ChooseFacultyScreenState extends State<ChooseFacultyScreen> {
 
             SizedBox(height: 20),
             DropdownButtonFormField(
-              value: selectedClass,
+              initialValue: selectedClass,
               hint: Text('Select Class'),
-              items: classes.map((cls) {
-                return DropdownMenuItem(
-                  value: cls['id'].toString(),
-                  child: Text(cls['name']),
-                );
-              }).toList(),
+              items: [
+                DropdownMenuItem(value: "all", child: Text("All Classes")),
+
+                ...classes.map((cls) {
+                  return DropdownMenuItem(
+                    value: cls['id'].toString(),
+                    child: Text(cls['name']),
+                  );
+                }),
+              ],
               onChanged: (value) {
                 setState(() {
                   selectedClass = value;

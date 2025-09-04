@@ -3,21 +3,46 @@ import 'package:frontend/Screens/notice_screen.dart';
 import 'package:frontend/Screens/teacher_home_screen.dart';
 
 class TeacherMainScreen extends StatefulWidget {
-  
-  const TeacherMainScreen({super.key});
+  final String collegeId;
+  final String classId;
+  final int? teacherId;
+  final String? teacherName;
+
+  const TeacherMainScreen({
+    super.key,
+    required
+    this.collegeId,
+    required
+    this.classId,
+    this.teacherId,
+    this.teacherName,
+  });
 
   @override
   State<TeacherMainScreen> createState() => _TeacherMainScreenState();
 }
 
 class _TeacherMainScreenState extends State<TeacherMainScreen> {
-  
   int _currentIndex = 0;
+  late final List<Widget> _screens;
 
-  final List<Widget> _screens = [
-    TeacherHomeScreen( ),
-    NoticeScreen(), // Notices
-  ];
+  @override
+  void initState() {
+    super.initState();
+   
+    _screens = [
+      TeacherHomeScreen(
+        collegeId: widget.collegeId,
+        classId: widget.classId,
+        teacherId: widget.teacherId,
+        teacherName: widget.teacherName,
+      ),
+      NoticeScreen(
+        collegeId: widget.collegeId,
+        classId: widget.classId,
+      ), // Notices
+    ];
+  }
 
   //0XFFBAC095 // background color
   //0XFFD4DE95 // text

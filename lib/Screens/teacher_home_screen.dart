@@ -6,8 +6,20 @@ import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
 
 class TeacherHomeScreen extends StatefulWidget {
- 
-  const TeacherHomeScreen({super.key});
+  final String collegeId;
+  final String classId;
+  final int? teacherId;
+  final String? teacherName;
+
+  const TeacherHomeScreen({
+    super.key,
+    required
+    this.collegeId,
+    required
+    this.classId,
+    this.teacherId,
+    this.teacherName
+  });
 
   @override
   State<TeacherHomeScreen> createState() => _TeacherHomeScreenState();
@@ -30,12 +42,14 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
     setState(() => isLoading = true);
 
     try {
-      var uri = Uri.parse("http://192.168.179.124:1000/notice/create");
+      var uri = Uri.parse("http://10.46.74.71:1000/notice/create");
 
       var request = http.MultipartRequest("POST", uri);
       request.fields["title"] = titleController.text;
       request.fields["content"] = contentController.text;
-      request.fields["created_by"] = "teacher1"; // 👈 change as per your auth
+      request.fields["created_by"] = widget.teacherId.toString();
+      request.fields["college_id"] = widget.collegeId.toString();
+      request.fields["class_id"] = widget.classId.toString();
 
       if (pickedFiles.isNotEmpty) {
         for (var file in pickedFiles) {
@@ -99,8 +113,8 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
     return Scaffold(
       backgroundColor: Color(0XFFFFFFFF),
       appBar: AppBar(
-        title: const Text(
-          "Teacher Panel",
+        title: Text(
+          "${widget.teacherName}",
           style: TextStyle(color: Color(0XFFFFFFFF)),
         ),
         backgroundColor: Color(0XFF2B2B2B),

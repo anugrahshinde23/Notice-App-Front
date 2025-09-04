@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiServices {
-  static const String baseURL = "http://192.168.179.124:1000";
+  static const String baseURL = "http://10.46.74.71:1000";
 
   // authRoutes :
   // 1. register
