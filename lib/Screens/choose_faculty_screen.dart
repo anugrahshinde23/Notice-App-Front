@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/login_screen.dart';
+import 'package:notify/Screens/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -34,7 +34,7 @@ class _ChooseFacultyScreenState extends State<ChooseFacultyScreen> {
 
   Future<void> fetchColleges() async {
     final response = await http.get(
-      Uri.parse("http://10.46.74.71:1000/info/colleges"),
+      Uri.parse("https://notice-app-back.onrender.com/info/colleges"),
     );
     print(response);
     if (response.statusCode == 200) {
@@ -48,7 +48,7 @@ class _ChooseFacultyScreenState extends State<ChooseFacultyScreen> {
 
   Future<void> fetchClasses(String collegeId) async {
     final response = await http.get(
-      Uri.parse("http://10.46.74.71:1000/info/classes/$collegeId"),
+      Uri.parse("https://notice-app-back.onrender.com/info/classes/$collegeId"),
     );
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -61,7 +61,7 @@ class _ChooseFacultyScreenState extends State<ChooseFacultyScreen> {
 
   Future<void> completeRegistration() async {
     final response = await http.post(
-      Uri.parse('http://10.46.74.71:1000/api/register'),
+      Uri.parse('https://notice-app-back.onrender.com/api/register'),
       headers: {"Content-Type": "application/json"},
       body: json.encode({
         "name": widget.name,

@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/choose_faculty_screen.dart';
-import 'package:frontend/Screens/login_screen.dart';
+import 'package:notify/Screens/choose_faculty_screen.dart';
+import 'package:notify/Screens/login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   final String collegeId;
   final String classId;
-  const RegisterScreen({super.key, required this.collegeId, required this.classId});
+  const RegisterScreen({
+    super.key,
+    required this.collegeId,
+    required this.classId,
+  });
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -13,6 +17,7 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   String value = 'student';
+  bool _obscureText = true;
   final nameController = TextEditingController();
   final passwordContoller = TextEditingController();
 
@@ -101,11 +106,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: TextField(
                     controller: passwordContoller,
                     style: TextStyle(color: Color(0XFF3D4127)),
+                    obscureText: _obscureText,
                     decoration: InputDecoration(
                       hintText: "Password",
                       hintStyle: TextStyle(color: Color(0XFFB3B3B3)),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(10),
+                      suffixIcon: IconButton(
+                        iconSize: 18,
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                        icon: Icon(_obscureText ? Icons.visibility_off : Icons.visibility),
+                      ),
                     ),
                   ),
                 ),
@@ -174,7 +189,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginScreen(collegeId: widget.collegeId.isNotEmpty ? widget.collegeId : null, classId: widget.classId.isNotEmpty ? widget.classId : null)),
+                      MaterialPageRoute(
+                        builder: (context) => LoginScreen(
+                          collegeId: widget.collegeId.isNotEmpty
+                              ? widget.collegeId
+                              : null,
+                          classId: widget.classId.isNotEmpty
+                              ? widget.classId
+                              : null,
+                        ),
+                      ),
                     );
                   },
                   style: ButtonStyle(

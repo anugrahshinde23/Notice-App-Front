@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/login_screen.dart';
+import 'package:notify/Screens/login_screen.dart';
+
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -9,16 +10,22 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreen>
+     {
+
   @override
   void initState() {
     super.initState();
+
+ 
+
     // ⏳ 3 sec wait
-    Timer(const Duration(seconds: 3), () {
+    Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const LoginScreen(), // 👈 sirf login page call karo
+          builder: (context) =>
+              const LoginScreen(), // 👈 sirf login page call karo
         ),
       );
     });
@@ -26,17 +33,33 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: Color(0xFF2B2B2B),
+    return  Scaffold(
+      backgroundColor: Colors.black,
       body: Center(
-        child: Text(
-          "Notice App",
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children:[ 
+            ClipOval(
+              child: Image.asset('assets/images/bell.gif',
+              height: 70,
+              width: 70,
+              fit: BoxFit.cover,
+              ),
+            ),
+
+            SizedBox(height: 20,),
+            
+            Text(
+            "NOTIFY",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          ]
         ),
+        
       ),
     );
   }

@@ -1,35 +1,142 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/splash_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:notify/Screens/splash_screen.dart';
 
+// Local notifications channel for Android
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 
-void main() {
-  // WidgetsFlutterBinding.ensureInitialized();
+// Background message handler
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(
+    options: kIsWeb
+        ? const FirebaseOptions(
+            apiKey: "AIzaSyByxn1813tdpCeFeAwLfbU9gQbSuSygPUI",
+            appId: "1:591860615209:web:2d354c7f44be6c9b45b438",
+            messagingSenderId: "591860615209",
+            projectId: "notify-ce627",
+          )
+        : null,
+  );
+  print('Handling a background message: ${message.messageId}');
+}
 
-  // // Logging
-  // OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+Future<void> setupFlutterNotifications() async {
+  if (!kIsWeb) {
+    const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  // // Initialize OneSignal with your App ID
-  // OneSignal.initialize("0c5ab1a4-cb63-4475-8897-01b7d9452b1a");
+    const InitializationSettings initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
 
-  // // Prompt for push notifications
-  // OneSignal.Notifications.requestPermission(true);
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
 
+    // Create Android channel
+    const AndroidNotificationChannel channel = AndroidNotificationChannel(
+      'high_importance_channel',
+      'High Importance Notifications',
+      importance: Importance.high,
+    );
 
+    await flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(channel);
+  }
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Firebase init
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+      options: const FirebaseOptions(
+        apiKey: "AIzaSyByxn1813tdpCeFeAwLfbU9gQbSuSygPUI",
+        appId: "1:591860615209:web:2d354c7f44be6c9b45b438",
+        messagingSenderId: "591860615209",
+        projectId: "notify-ce627",
+      ),
+    );
+
+    // Web push notification permission
+    NotificationSettings settings =
+        await FirebaseMessaging.instance.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+    print('Web permission: ${settings.authorizationStatus}');
+  } else {
+    await Firebase.initializeApp();
+    await setupFlutterNotifications();
+  }
+
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    setupFCM();
+  }
+
+  void setupFCM() async {
+    // Device token fetch
+    String? token = await FirebaseMessaging.instance.getToken();
+    print("FCM Token: $token");
+    // Save this token to backend here
+    // await ApiServices.saveTokenToBackend(studentId);
+
+    // Foreground messages
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Foreground message: ${message.notification?.title}');
+      if (message.notification != null && !kIsWeb) {
+        flutterLocalNotificationsPlugin.show(
+          message.notification.hashCode,
+          message.notification!.title,
+          message.notification!.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              'high_importance_channel',
+              'High Importance Notifications',
+              importance: Importance.high,
+              priority: Priority.high,
+            ),
+          ),
+        );
+      }
+    });
+
+    // Click on notification
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      print('Notification clicked!');
+      // Navigate to a specific page if needed
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: 'Notify',
       theme: ThemeData.light(),
-      home: SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }

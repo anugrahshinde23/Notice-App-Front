@@ -1,8 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class ApiServices {
-  static const String baseURL = "http://10.46.74.71:1000";
+  static const String baseURL = "https://notice-app-back.onrender.com";
+
+  static Future<void> saveTokenToBackend(String studentId) async {
+    String? token = await FirebaseMessaging.instance.getToken();
+
+    if (token != null) {
+      var response = await http.post(
+        Uri.parse("$baseURL/api/save-token"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"student_id": studentId, "fcm_token": token}),
+      );
+      print("fcm token :  $token");
+      print("Token Saved : ${response.body} ");
+    }
+  }
 
   // authRoutes :
   // 1. register
@@ -34,8 +49,34 @@ class ApiServices {
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({"name": name, "password": password}),
     );
+    
 
     return jsonDecode(response.body);
+  }
+
+  // delete notice :
+  static Future<bool> deleteNotice(int id) async {
+    final response = await http.delete(Uri.parse("$baseURL/notice/delete/$id"));
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<bool> editNotice(int id, String title, String content) async {
+    final response = await http.put(
+      Uri.parse("$baseURL/notice/edit/$id"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"title": title, "content": content}),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   // static Future<Map<String, dynamic>> createNotice(
@@ -51,17 +92,16 @@ class ApiServices {
   //   return jsonDecode(response.body);
   // }
 
-//    Future<List<dynamic>> fetchNotices() async {
-//   final response = await http.get(Uri.parse("$baseURL/notice/get"));
+  //    Future<List<dynamic>> fetchNotices() async {
+  //   final response = await http.get(Uri.parse("$baseURL/notice/get"));
 
-//   if (response.statusCode == 200) {
-//     final Map<String, dynamic> data = jsonDecode(response.body);
+  //   if (response.statusCode == 200) {
+  //     final Map<String, dynamic> data = jsonDecode(response.body);
 
-//     // yaha se sirf "allnotice" list nikalo
-//     return data["allnotice"];
-//   } else {
-//     throw Exception("Failed to fetch notices");
-//   }
-// }
-
+  //     // yaha se sirf "allnotice" list nikalo
+  //     return data["allnotice"];
+  //   } else {
+  //     throw Exception("Failed to fetch notices");
+  //   }
+  // }
 }

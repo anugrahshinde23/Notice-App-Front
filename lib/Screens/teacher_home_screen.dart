@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:notify/Screens/login_screen.dart';
+import 'package:notify/Screens/teacher_profile_screen.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
 
@@ -13,12 +15,10 @@ class TeacherHomeScreen extends StatefulWidget {
 
   const TeacherHomeScreen({
     super.key,
-    required
-    this.collegeId,
-    required
-    this.classId,
+    required this.collegeId,
+    required this.classId,
     this.teacherId,
-    this.teacherName
+    this.teacherName,
   });
 
   @override
@@ -42,7 +42,7 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
     setState(() => isLoading = true);
 
     try {
-      var uri = Uri.parse("http://10.46.74.71:1000/notice/create");
+      var uri = Uri.parse("https://notice-app-back.onrender.com/notice/create");
 
       var request = http.MultipartRequest("POST", uri);
       request.fields["title"] = titleController.text;
@@ -117,8 +117,89 @@ class _TeacherHomeScreenState extends State<TeacherHomeScreen> {
           "${widget.teacherName}",
           style: TextStyle(color: Color(0XFFFFFFFF)),
         ),
+        leading: Padding(
+          padding: const EdgeInsets.all(7),
+          child: Container(
+            margin: EdgeInsets.only(left: 15),
+            child: Builder(
+              builder: (context) {
+                return GestureDetector(
+                  onTap: () {
+                    Scaffold.of(context).openDrawer();
+                  },
+                  child: CircleAvatar(backgroundColor: Colors.grey, radius: 5),
+                );
+              },
+            ),
+          ),
+        ),
+
         backgroundColor: Color(0XFF2B2B2B),
         centerTitle: true,
+      ),
+
+      drawer: Drawer(
+        backgroundColor: Color(0XFF2B2B2B),
+
+        child: ListView(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Color(0XFF2B2B2B),
+                border: BoxBorder.fromLTRB(
+                  bottom: BorderSide(color: Color(0XFFB3B3B3), width: 0.1),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+
+                    spacing: 5,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TeacherProfileScreen(),
+                            ),
+                          );
+                        },
+                        child: CircleAvatar(radius: 30),
+                      ),
+                      Text(
+                        "@${widget.teacherName}",
+                        style: TextStyle(color: Color(0XFFB3B3B3)),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.more_vert, color: Color(0XFFD4D4D4)),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings, color: Color(0XFFFFFFFF),),
+              title: Text("Settings", style: TextStyle(color: Color(0XFFFFFFFF), fontWeight: FontWeight.bold),),
+              onTap: () {},
+            ),
+            ListTile(
+              leading: Icon(Icons.logout, color: Colors.red,),
+              title: Text("Logout", style: TextStyle(color: Colors.red),),
+              onTap: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: SafeArea(
         child: Center(

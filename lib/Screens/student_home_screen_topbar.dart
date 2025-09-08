@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/student_home_screen.dart';
-import 'package:frontend/Screens/updates_screen.dart';
-
+import 'package:notify/Screens/login_screen.dart';
+import 'package:notify/Screens/student_home_screen.dart';
+import 'package:notify/Screens/updates_screen.dart';
 
 class StudentHomeScreenTopbar extends StatefulWidget {
   final String studentName;
   final String collegeId;
   final String classId;
+  final int studentId;
 
   const StudentHomeScreenTopbar({
     super.key,
     required this.studentName,
     required this.collegeId,
     required this.classId,
-
+    required this.studentId,
   });
 
   @override
@@ -22,9 +23,6 @@ class StudentHomeScreenTopbar extends StatefulWidget {
 }
 
 class _StudentHomeScreenTopbarState extends State<StudentHomeScreenTopbar> {
- 
-
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -37,6 +35,17 @@ class _StudentHomeScreenTopbarState extends State<StudentHomeScreenTopbar> {
             style: TextStyle(color: Color(0XFFFFFFFF)),
           ),
           centerTitle: true,
+          actions: [
+            IconButton(
+              onPressed: () async {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+              icon: Icon(Icons.logout),
+            ),
+          ],
 
           bottom: TabBar(
             indicatorColor: Color(0XFFD4D4D4),
@@ -58,6 +67,8 @@ class _StudentHomeScreenTopbarState extends State<StudentHomeScreenTopbar> {
             StudentHomeScreen(
               collegeId: widget.collegeId,
               classId: widget.classId,
+              studentName: widget.studentName,
+              studentId: widget.studentId,
             ),
             UpdatesScreen(),
           ],

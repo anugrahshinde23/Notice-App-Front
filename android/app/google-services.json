@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "591860615209",
+    "project_id": "notify-ce627",
+    "storage_bucket": "notify-ce627.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:591860615209:android:13e531b71c258cb645b438",
+        "android_client_info": {
+          "package_name": "com.example.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQZccjLotJLStTv1ZdLuQ4cUtA46P7-3I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

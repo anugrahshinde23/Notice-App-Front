@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/student_home_screen_topBar.dart';
-import 'package:frontend/Screens/teacher_bottom_nav.dart';
-import 'package:frontend/Screens/register_screen.dart';
+import 'package:notify/Screens/student_home_screen_topBar.dart';
+import 'package:notify/Screens/teacher_bottom_nav.dart';
+import 'package:notify/Screens/register_screen.dart';
 
-import 'package:frontend/Services/api_services.dart';
+import 'package:notify/Services/api_services.dart';
 
 class LoginScreen extends StatefulWidget {
   final String? collegeId;
@@ -15,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool _obscureText = true;
   final nameController = TextEditingController();
   final passwordContoller = TextEditingController();
 
@@ -27,6 +28,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (data.containsKey('token')) {
       String role = data['user']['role'];
       print(role);
+
+      // Save user session
+
       if (role == 'teacher') {
         print("successfully login as teacher");
         Navigator.pushReplacement(
@@ -41,9 +45,8 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
       } else if (role == 'student') {
-       
-       
-              print("successfully login as student");
+        print("successfully login as student");
+        await ApiServices.saveTokenToBackend(data['user']['id'].toString());
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -51,6 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
               studentName: nameController.text,
               collegeId: data['user']['college_id'].toString(),
               classId: data['user']['class_id'].toString(),
+              studentId: data['user']['id'],
             ),
           ),
         );
@@ -92,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextField(
                     controller: nameController,
                     style: TextStyle(color: Color(0XFF3D4127)),
+
                     decoration: InputDecoration(
                       hintText: "Username",
                       hintStyle: TextStyle(color: Color(0XFFB3B3B3)),
@@ -114,11 +119,25 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: TextField(
                     controller: passwordContoller,
                     style: TextStyle(color: Color(0XFF3D4127)),
+                    obscureText: _obscureText,
                     decoration: InputDecoration(
                       hintText: "Password",
                       hintStyle: TextStyle(color: Color(0XFFB3B3B3)),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.all(10),
+                      suffixIcon: IconButton(
+                        iconSize: 18,
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                        icon: Icon(
+                          _obscureText
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                        ),
+                      ),
                     ),
                   ),
                 ),

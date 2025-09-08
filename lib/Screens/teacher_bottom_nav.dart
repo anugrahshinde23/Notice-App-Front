@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/Screens/notice_screen.dart';
-import 'package:frontend/Screens/teacher_home_screen.dart';
+import 'package:notify/Screens/notice_screen.dart';
+import 'package:notify/Screens/teacher_home_screen.dart';
 
 class TeacherMainScreen extends StatefulWidget {
   final String collegeId;
@@ -10,10 +10,8 @@ class TeacherMainScreen extends StatefulWidget {
 
   const TeacherMainScreen({
     super.key,
-    required
-    this.collegeId,
-    required
-    this.classId,
+    required this.collegeId,
+    required this.classId,
     this.teacherId,
     this.teacherName,
   });
@@ -29,7 +27,8 @@ class _TeacherMainScreenState extends State<TeacherMainScreen> {
   @override
   void initState() {
     super.initState();
-   
+  
+
     _screens = [
       TeacherHomeScreen(
         collegeId: widget.collegeId,
@@ -40,6 +39,8 @@ class _TeacherMainScreenState extends State<TeacherMainScreen> {
       NoticeScreen(
         collegeId: widget.collegeId,
         classId: widget.classId,
+        teacherId: widget.teacherId,
+        teacherName: widget.teacherName,
       ), // Notices
     ];
   }

@@ -2,10 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:intl/intl.dart';
+import 'package:notify/Screens/comment_screen.dart';
+import 'package:notify/Services/api_services.dart';
+
 class NoticeScreen extends StatefulWidget {
   final String collegeId;
   final String classId;
-  const NoticeScreen({super.key, required this.collegeId, required this.classId});
+  final int? teacherId;
+  final String? teacherName;
+
+  const NoticeScreen({
+    super.key,
+    required this.collegeId,
+    required this.classId,
+    required this.teacherId,
+    required this.teacherName,
+  });
 
   @override
   State<NoticeScreen> createState() => _NoticeScreenState();
@@ -21,13 +34,89 @@ class _NoticeScreenState extends State<NoticeScreen> {
     // print(widget.classId);
     // print(widget.collegeId);
     fetchNotices();
+    // print(widget.teacherId);
+    // print(widget.teacherName);
+  }
+
+  void _deleteNotice(int id) async {
+    final success = await ApiServices.deleteNotice(id);
+    if (success) {
+      setState(() {
+        notices.removeWhere((n) => n['id'] == id);
+      });
+    }
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Notice deleted")));
+  }
+
+  void _editNotice(int id, String oldTitle, String oldContent) async {
+    TextEditingController titleController = TextEditingController(
+      text: oldTitle,
+    );
+    TextEditingController contentController = TextEditingController(
+      text: oldContent,
+    );
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Color(0XFFFFFFFF),
+        title: Text(
+          "Edit Notice",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(labelText: "Title"),
+            ),
+            TextField(
+              controller: contentController,
+              decoration: const InputDecoration(labelText: "Content"),
+            ),
+          ],
+        ),
+
+        actions: [
+          TextButton(
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Color(0XFF2B2B2B)),
+            ),
+            onPressed: () async {
+              final success = await ApiServices.editNotice(
+                id,
+                titleController.text,
+                contentController.text,
+              );
+              if (success) {
+                setState(() {
+                  final index = notices.indexWhere((n) => n['id'] == id);
+                  notices[index]['title'] = titleController.text;
+                  notices[index]['content'] = contentController.text;
+                });
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text("Notice updated")));
+              }
+            },
+            child: Text("save", style: TextStyle(color: Color(0XFFFFFFFF))),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> fetchNotices() async {
     try {
       final response = await http.get(
         Uri.parse(
-          "http://10.46.74.71:1000/notice/get/${widget.collegeId}/${widget.classId}",
+          "https://notice-app-back.onrender.com/notice/get/${widget.collegeId}/${widget.classId}/${widget.teacherId}",
         ),
       );
       if (response.statusCode == 200) {
@@ -77,9 +166,9 @@ class _NoticeScreenState extends State<NoticeScreen> {
                     filePath = filePath.split("/").last;
                   }
                 }
-
+                String category = notice['category'];
                 final imageUrl = (filePath != null && filePath.isNotEmpty)
-                    ? "http://10.46.74.71:1000/uploads/$filePath"
+                    ? "https://notice-app-back.onrender.com/uploads/$filePath"
                     : null;
 
                 return Card(
@@ -93,10 +182,39 @@ class _NoticeScreenState extends State<NoticeScreen> {
                   ),
                   elevation: 3,
                   child: Padding(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              category,
+                              style: TextStyle(
+                                color: category == "Exam"
+                                    ? Colors.red
+                                    : category == "Assignment"
+                                    ? Colors.blue
+                                    : category == "Event"
+                                    ? Colors.green
+                                    : category == "Alert"
+                                    ? Colors.orange
+                                    : category == "General"
+                                    ? Colors.grey
+                                    : null,
+                              ),
+                            ),
+                            Text(
+                              "Date: ${notice["created_at"] != null ? DateFormat('dd MMM yyy, hh:mm a').format(DateTime.parse(notice["created_at"])) : "unknown date"}",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color(0XFFB3B3B3),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10),
                         Text(
                           notice["title"] ?? "No Title",
                           style: const TextStyle(
@@ -123,14 +241,72 @@ class _NoticeScreenState extends State<NoticeScreen> {
                             ),
                           ),
 
-                        const SizedBox(height: 10),
-                        Text(
-                          "Date: ${notice["created_at"]}",
-                          style: const TextStyle(
-                            fontSize: 12,
-                            color: Color(0XFFB3B3B3),
-                          ),
+                        Row(
+                          
+                          spacing: 15,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                _editNotice(
+                                  notice['id'],
+                                  notice['title'],
+                                  notice['content'],
+                                );
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStatePropertyAll(
+                                  Color(0XFF2B2B2B),
+                                ),
+                                minimumSize: WidgetStatePropertyAll(
+                                  Size(10, 30),
+                                ),
+                              ),
+                              child: Text(
+                                "Edit",
+                                style: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                _deleteNotice(notice['id']);
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStatePropertyAll(
+                                  Color(0XFFFFFFFF),
+                                ),
+                                minimumSize: WidgetStatePropertyAll(
+                                  Size(10, 30),
+                                ),
+                              ),
+                              child: Text(
+                                "Delete",
+                                style: TextStyle(color: Colors.red),
+                              ),
+                            ),
+                            SizedBox(width: 59,),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                 IconButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CommentScreen(
+                                        noticeId: notice['id'],
+                                        userId: widget.teacherId,
+                                        userType: widget.teacherName,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(Icons.comment),
+                              ),
+                              ],
+                            )
+                          ],
                         ),
+                        
                       ],
                     ),
                   ),
